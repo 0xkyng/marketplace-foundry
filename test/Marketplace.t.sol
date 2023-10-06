@@ -66,26 +66,25 @@ contract MarketPlaceTest is Helpers {
     function testMinDuration() public {
         changeSigner(userA);
         chix.setApprovalForAll(address(mPlace), true);
-        c.deadline = uint88(block.timestamp + 59 minutes);
         vm.expectRevert(bytes("Deadline too short"));
         mPlace.createCatalogue(c);
     }
 
-    // function testValidSig() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    //     c.deadline = uint88(block.timestamp + 90 minutes);
-    //     c.signature = createSig(
-    //         c.nftAddress,
-    //         c.tokenId,
-    //         c.price,
-    //         c.deadline,
-    //         c.creator,
-    //         privKeyB
-    //     );
-    //     vm.expectRevert(bytes("Invalid signsture"));
-    //     mPlace.createCatalogue(c);
-    // }
+    function testValidSig() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+        c.deadline = uint88(block.timestamp + 90 minutes);
+        c.signature = createSig(
+            c.nftAddress,
+            c.tokenId,
+            c.price,
+            c.deadline,
+            c.creator,
+            privKeyB
+        );
+        vm.expectRevert(bytes("Invalid signsture"));
+        mPlace.createCatalogue(c);
+    }
 
     // EDIT LISTING
     function testEditNonValidCatalogue() public {
@@ -94,46 +93,46 @@ contract MarketPlaceTest is Helpers {
         mPlace.editCatalogue(1, 0, false);
     }
 
-    // function testEditCatalogueNotOwner() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    //     c.deadline = uint88(block.timestamp + 120 minutes);
-    //     c.signature = createSig(
-    //         c.nftAddress,
-    //         c.tokenId,
-    //         c.price,
-    //         c.deadline,
-    //         c.creator,
-    //         privKeyA
-    //     );
+    function testEditCatalogueNotOwner() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+        c.deadline = uint88(block.timestamp + 120 minutes);
+        c.signature = createSig(
+            c.nftAddress,
+            c.tokenId,
+            c.price,
+            c.deadline,
+            c.creator,
+            privKeyA
+        );
 
-    //     uint256 cId = mPlace.createCatalogue(c);
+        uint256 cId = mPlace.createCatalogue(c);
 
-    //     changeSigner(userB);
-    //     vm.expectRevert(bytes("You are not the owner"));
-    //     mPlace.editCatalogue(cId, 0, false);
-    // }
+        changeSigner(userB);
+        vm.expectRevert(bytes("You are not the owner"));
+        mPlace.editCatalogue(cId, 0, false);
+    }
 
-    // function testEditListing() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    //     c.deadline = uint88(block.timestamp + 120 minutes);
-    //     c.signature = createSig(
-    //         c.nftAddress,
-    //         c.tokenId,
-    //         c.price,
-    //         c.deadline,
-    //         c.creator,
-    //         privKeyA
-    //     );
-    //     uint256 cId = mPlace.createCatalogue(c);
-    //     mPlace.editCatalogue(cId, 0.01 ether, false);
+    function testEditListing() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+        c.deadline = uint88(block.timestamp + 120 minutes);
+        c.signature = createSig(
+            c.nftAddress,
+            c.tokenId,
+            c.price,
+            c.deadline,
+            c.creator,
+            privKeyA
+        );
+        uint256 cId = mPlace.createCatalogue(c);
+        mPlace.editCatalogue(cId, 0.01 ether, false);
 
 
-    //     Marketplace.Catalogue memory edit = mPlace.getCatalogue(cId);
-    //     assertEq(edit.price, 0.01 ether);
-    //     assertEq(edit.active, false);
-    // }
+        Marketplace.Catalogue memory edit = mPlace.getCatalogue(cId);
+        assertEq(edit.price, 0.01 ether);
+        assertEq(edit.active, false);
+    }
 
     // EXECUTE CATALAGUE
     function testExecuteNonValidCatalogue() public {
@@ -142,47 +141,47 @@ contract MarketPlaceTest is Helpers {
         mPlace.executeCatalogue(1);
     }
 
-    // function testExecuteExpiredCatalogue() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    // }
+    function testExecuteExpiredCatalogue() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+    }
 
-    // function testExecuteCatalogueNotActive() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    //     c.deadline = uint88(block.timestamp + 120 minutes);
-    //     c.signature = createSig(
-    //         c.nftAddress,
-    //         c.tokenId,
-    //         c.price,
-    //         c.deadline,
-    //         c.creator,
-    //         privKeyA
-    //     );
-    //     uint256 cId = mPlace.createCatalogue(c);
-    //     mPlace.editCatalogue(cId, 0.01 ether, false);
-    //     changeSigner(userB);
-    //     vm.expectRevert(bytes("Inactive catalogue"));
-    //     mPlace.executeCatalogue(cId);
-    // }
+    function testExecuteCatalogueNotActive() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+        c.deadline = uint88(block.timestamp + 120 minutes);
+        c.signature = createSig(
+            c.nftAddress,
+            c.tokenId,
+            c.price,
+            c.deadline,
+            c.creator,
+            privKeyA
+        );
+        uint256 cId = mPlace.createCatalogue(c);
+        mPlace.editCatalogue(cId, 0.01 ether, false);
+        changeSigner(userB);
+        vm.expectRevert(bytes("Inactive catalogue"));
+        mPlace.executeCatalogue(cId);
+    }
 
-    // function testExecuteInappropriatePrice() public {
-    //     changeSigner(userA);
-    //     chix.setApprovalForAll(address(mPlace), true);
-    //     c.deadline = uint88(block.timestamp + 120 minutes);
-    //     c.signature = createSig(
-    //         c.nftAddress,
-    //         c.tokenId,
-    //         c.price,
-    //         c.deadline,
-    //         c.creator,
-    //         privKeyA
-    //     );
-    //     uint256 cId = mPlace.createCatalogue(c);
-    //     changeSigner(userB);
-    //     vm.expectRevert(bytes("Inappriopriate price"));
-    //     mPlace.executeCatalogue{value: 0.9 ether}(cId);
-    // }
+    function testExecuteInappropriatePrice() public {
+        changeSigner(userA);
+        chix.setApprovalForAll(address(mPlace), true);
+        c.deadline = uint88(block.timestamp + 120 minutes);
+        c.signature = createSig(
+            c.nftAddress,
+            c.tokenId,
+            c.price,
+            c.deadline,
+            c.creator,
+            privKeyA
+        );
+        uint256 cId = mPlace.createCatalogue(c);
+        changeSigner(userB);
+        vm.expectRevert(bytes("Inappriopriate price"));
+        mPlace.executeCatalogue{value: 0.9 ether}(cId);
+    }
 
    
 

@@ -36,7 +36,7 @@ contract Marketplace {
         require(ERC721(c.nftAddress).isApprovedForAll(msg.sender, address(this)), "You don't have approval to sell this nft");
         
         require(c.price > (0.01 * 100), "Low price");
-        require(c.deadline < block.timestamp, 'Deadline too short');
+        require(c.deadline > block.timestamp, 'Deadline too short');
 
         // Assert signature
         require(SignUtils.isValid(
@@ -73,7 +73,7 @@ contract Marketplace {
 
         Catalogue storage newCatalogue = catalogues[_catalogueId];
 
-        require(newCatalogue.deadline < block.timestamp, "Expired catalogue");
+        require(newCatalogue.deadline > block.timestamp, "Expired catalogue");
         require(newCatalogue.active, "Inactive catalogue");
         require(newCatalogue.price == msg.value, "Inappriopriate price");
 
